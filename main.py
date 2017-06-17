@@ -1,12 +1,12 @@
 import time
-import MatrixLED2^2Col
+import MatrixLED4Col
 
 #Constants
 LEDSIZE = 16 
-DummyPtnList = [[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],[0]]
+DummyPtnList = [[6],[6],[6],[6],[6],[6],[6],[6],[6],[6],[6],[6],[6],[6],[6],[6]]
 #0=K, 2=Grn, 3=Red, 6=Org
 
-MatrixLED = MatrixLED2^2Col(LEDSIZE, "RED", "GREEN")
+MatrixLED = MatrixLED4Col(LEDSIZE, "RED", "GREEN")
 
 MatrixLED.push(DummyPtnList)
 MatrixLED.flashLED()
