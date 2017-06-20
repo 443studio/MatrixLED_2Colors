@@ -1,9 +1,9 @@
 import RPi.GPIO as GPIO
 import time
 import threading
+GPIO.setmode(GPIO.BCM)
 
-
-class MatrixLED4Col():
+class MatrixLED4Col:
     def __init__(self, SIZE, RATCH, SIK, AnSI, GrSI, ReSI):
         self.SIZE = SIZE
         self.RATCH = RATCH
@@ -13,35 +13,71 @@ class MatrixLED4Col():
         self.GrSI = GrSI
         self.ReSI = ReSI
 
-        self.ReList = [[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],]
-        self.GrList = [[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],]
+        self.AnDATA = 0
+
+        self.loopFlag = True
+
+        self.ReList = [
+[0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,],
+[0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,],
+[0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,],
+[0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,],
+[0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,],
+[0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,],
+[0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,],
+[0,0,0,0,1,0,0,1,1,0,0,1,0,0,0,0,],
+[0,0,0,0,1,0,0,1,1,0,0,1,0,0,0,0,],
+[0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,],
+[0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,],
+[0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,],
+[0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,],
+[0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,],
+[0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,],
+[0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,],]
+        self.GrList = [
+[0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,],
+[0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,],
+[0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,],
+[0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,],
+[0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,],
+[0,0,0,1,0,0,1,1,1,1,0,0,1,0,0,0,],
+[0,0,0,1,0,0,1,0,0,1,0,0,1,0,0,0,],
+[0,0,0,1,0,0,1,0,0,1,0,0,1,0,0,0,],
+[0,0,0,1,0,0,1,1,1,1,0,0,1,0,0,0,],
+[0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,],
+[0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,],
+[0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,],
+[0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,],
+[0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,],
+[0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,],
+[0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,]]
 
 
     def SetSI(self, SI, DATA):
-        if DATA == 1:
-            GPIO.output(SI, GPIO.LOW)
-        elif DATA == 0:
+        if DATA:
             GPIO.output(SI, GPIO.HIGH)
-        return
+        else:
+            GPIO.output(SI, GPIO.LOW)
 
     def Clock(self, PIN):
         GPIO.output(PIN,GPIO.HIGH)
         GPIO.output(PIN,GPIO.LOW)
-        return
-
     def flashLED(self):
-        AnDATA = 0
         for a in range(0,4):
             for x in range(0,self.SIZE):
                 for y in range(0, self.SIZE):
                     if x == y:
-                        AnDATA = 0
+                        self.AnDATA = 1
                     else:
-                        AnDATA = 1
+                        self.AnDATA = 0
 
-                    SetSI(self.AnSI, AnDATA)
-                    SetSI(self.GrSI, (self.GrList[x] >> y) & 0b1)
-                    SetSI(self.ReSI, (self.ReList[x] >> y) & 0b1)
-                
-                Clock(self.SIK)
-            Clock(self.RATCH)
+                    self.SetSI(self.AnSI, self.AnDATA)
+                    self.SetSI(self.GrSI, not self.GrList[x][y])
+                    self.SetSI(self.ReSI, not self.ReList[x][y])
+                    self.Clock(self.SIK)
+                self.Clock(self.RATCH)
+                time.sleep(0.00000000000000000001)
+
+        if self.loopFlag:
+            t = threading.Thread(target=self.flashLED)
+            t.start()
