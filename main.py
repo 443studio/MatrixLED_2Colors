@@ -29,5 +29,5 @@ try:
 
 except KeyboardInterrupt:
     MatrixLED.loopFlag = False
+    time.sleep(0.5)
     GPIO.cleanup()
-

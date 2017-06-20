@@ -81,3 +81,12 @@ class MatrixLED4Col:
         if self.loopFlag:
             t = threading.Thread(target=self.flashLED)
             t.start()
+        else:
+            for x in range(0,self.SIZE):
+                for y in range(0,self.SIZE):
+                    ZERO = 0
+                    self.SetSI(self.AnSI, ZERO)
+                    self.SetSI(self.GrSI, ZERO)
+                    self.SetSI(self.ReSI, ZERO)
+                    self.Clock(self.SIK)
+                self.Clock(self.RATCH)
